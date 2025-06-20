@@ -1,0 +1,17 @@
+[project]
+name = "mcp-client"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.54.0",
+    "llama-index>=0.12.41",
+    "mcp>=1.9.3",
+    "python-dotenv>=1.1.0",
+]
+
+[tool.uv.workspace]
+members = [
+    "mcp-client-llamaindex",
+]

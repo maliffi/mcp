@@ -1,0 +1,15 @@
+[project]
+name = "mcp-client-llamaindex"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.54.0",
+    "asyncio>=3.4.3",
+    "llama-index-llms-ollama>=0.6.2",
+    "llama-index-tools-mcp>=0.2.5",
+    "mcp>=1.9.4",
+    "ollama>=0.5.1",
+    "python-dotenv>=1.1.0",
+]
