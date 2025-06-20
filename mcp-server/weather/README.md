@@ -70,10 +70,14 @@ forecast = await get_forecast(37.7749, -122.4194)
 
 ## Running the Service
 
-To start the MCP server:
 
+To start the MCP inspector for development run:
 ```bash
-python weather.py
+uv run mcp dev weather.py
+```
+To start the MCP server:
+```bash
+uv run weather.py —-server_type=sse
 ```
 
 The service will start and listen for incoming requests using standard input/output streams, which is the default transport method for MCP communication.

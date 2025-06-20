@@ -1,7 +1,7 @@
 from typing import Any
 import httpx
 from mcp.server.fastmcp import FastMCP
-
+import argparse
 
 # -- Constants
 # Base URL for the NWS API
@@ -116,4 +116,19 @@ if __name__ == "__main__":
     # Initialize and run the server
     # (transport='stdio' specifies that the server should use standard input/output streams for communication 
     # rather than other transport options like HTTP or WebSockets)
-    mcp.run(transport='stdio')
+    
+    
+
+    # Production Mode
+    # python weather.py --server_type=sse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--server_type", type=str, default="sse", choices=["sse", "stdio"]
+    )
+
+    args = parser.parse_args()
+    # -- Development Mode
+    # mcp.run(transport='stdio')
+    # -- Production Mode
+    mcp.run(args.server_type)
