@@ -17,17 +17,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # What is the weather in NYC?
-SYSTEM_PROMPT = """
-You are an AI assistant for Tool Calling.
-
-Before you help a user, you need to work with tools to interact with National weather service.
-
-When a user asks a question:
-1. Determine if you need to use a tool to answer
-2. If yes, execute immediatly the tool call with the correct parameters
-3. After receiving the tool results, provide a natural language response to the user based on those results
-4. Do NOT just return the raw tool output or tool calls
-"""
 
 def load_llm():
     """
