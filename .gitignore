@@ -8,7 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
-.env
+# .env
 # Mac OS X index files
 **/.DS_Store
 # Lock files

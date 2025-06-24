@@ -16,11 +16,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = """\
-You are an AI assistant for Tool Calling.
-
-Before you help a user, you need to work with tools to interact with Our Database
-"""
+# What is the weather in NYC?
 
 def load_llm():
     """
@@ -64,21 +60,16 @@ class MCPClient(BasicMCPClient):
             tools.append(func)
         self.tools = tools
 
-    
-
-
-
 async def get_agent(tools: McpToolSpec, llm: Ollama):
     tools = await tools.to_tool_list_async()
     agent = FunctionAgent(
         name="Agent",
-        description="An agent that can work with Our Database software.",
+        description="An agent that can work with National Weather Service.",
         tools=tools,
         llm=llm,
         system_prompt=SYSTEM_PROMPT,
     )
     return agent
-
 
 async def handle_user_message(
     message_content: str,
@@ -86,15 +77,55 @@ async def handle_user_message(
     agent_context: Context,
     verbose: bool = False,
 ):
-    handler = agent.run(message_content, ctx=agent_context)
+    # Create a handler for streaming the agent's steps
+    handler = await agent.run(message_content, ctx=agent_context)
+    
+    # Track tools and their results for manual execution if needed
+    tool_calls = []
+    tool_results = []
+    
+    # Stream events to see the agent's progress
     async for event in handler.stream_events():
-        if verbose and type(event) == ToolCall:
-            print(f"Calling tool {event.tool_name} with kwargs {event.tool_kwargs}")
-        elif verbose and type(event) == ToolCallResult:
-            print(f"Tool {event.tool_name} returned {event.tool_output}")
-
-    response = await handler
-    return str(response)
+        logger.info(f"Event type: {type(event)}, event: {event}\n\n------\n\n")
+        if type(event) == ToolCall:
+            tool_calls.append(event)
+            if verbose:
+                print(f"Calling tool {event.tool_name} with kwargs {event.tool_kwargs}")
+        elif type(event) == ToolCallResult:
+            tool_results.append(event)
+            if verbose:
+                print(f"Tool {event.tool_name} returned {event.tool_output}")
+    
+    # Get the final response after tool execution
+    final_response = await handler
+    logger.info(f"Final response: {final_response}")
+    
+    # If the response is a JSON object with tool_calls and no actual response,
+    # we need to manually process the tool results and generate a final response
+    if str(final_response).strip().startswith('{"tool_calls"'):
+        if len(tool_results) > 0:
+            # If we have tool results, we can use them to generate a response
+            # Create a new prompt with the tool results
+            tool_result_message = f"Tool results: \n"
+            for result in tool_results:
+                tool_result_message += f"{result.tool_name} returned: {result.tool_output}\n"
+            
+            # Ask the LLM to provide a natural language response based on the tool results
+            final_prompt = f"""Based on the following tool results, provide a natural language response to the user's question: '{message_content}'
+            
+            {tool_result_message}
+            
+            Response to user:"""
+            
+            response = await Settings.llm.acomplete(final_prompt)
+            return response.text
+        else:
+            # If we don't have tool results but we have tool calls,
+            # we need to manually execute the tools
+            return f"I found information that might help answer your question about: '{message_content}', but I need to process it further."
+    
+    # Return the final response
+    return str(final_response)
 
     
 
@@ -117,7 +148,7 @@ async def main():
             break
         print("User: ", user_input)
         response = await handle_user_message(user_input, agent, agent_context, verbose=True)
-    print("Agent: ", response)
+        print("Agent: ", response)
 
 if __name__ == "__main__":
     asyncio.run(main())
