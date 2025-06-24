@@ -18,6 +18,18 @@ logger = logging.getLogger(__name__)
 
 # What is the weather in NYC?
 
+SYSTEM_PROMPT = """
+You are an AI assistant for Tool Calling.
+
+Before you help a user, you need to work with tools to interact with National weather service.
+
+When a user asks a question:
+1. Determine if you need to use a tool to answer
+2. If yes, execute immediatly the tool call with the correct parameters
+3. After receiving the tool results, provide a natural language response to the user based on those results
+4. Do NOT just return the raw tool output or tool calls
+"""
+
 def load_llm():
     """
     Load the LLM from the configuration and set it as the default LLM in settings.
@@ -68,6 +80,7 @@ async def get_agent(tools: McpToolSpec, llm: Ollama):
         tools=tools,
         llm=llm,
         system_prompt=SYSTEM_PROMPT,
+        verbose=True,
     )
     return agent
 
@@ -78,7 +91,7 @@ async def handle_user_message(
     verbose: bool = False,
 ):
     # Create a handler for streaming the agent's steps
-    handler = await agent.run(message_content, ctx=agent_context)
+    handler = agent.run(message_content, ctx=agent_context)
     
     # Track tools and their results for manual execution if needed
     tool_calls = []

@@ -1,13 +1,9 @@
-
-
 import asyncio
-from llama_index.llms.ollama import Ollama
-from llama_index.core import Settings
 from typing import Any, List
-from llama_index.tools.mcp import BasicMCPClient, McpToolSpec
-from llama_index.core.base.llms.types import ChatMessage
+
+from llama_index.core import Settings
+from llama_index.core.base.llms.types import ChatMessage 
 from llama_index.core.tools import FunctionTool
-from config import Config
 from llama_index.core.llms.function_calling import FunctionCallingLLM
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.core.tools.types import BaseTool
@@ -18,6 +14,13 @@ from llama_index.core.workflow import (
     StopEvent,
     step,
 )
+
+# Import from llama_index modules
+from llama_index.llms.ollama import Ollama
+from llama_index.tools.mcp import BasicMCPClient, McpToolSpec
+
+# Local imports
+from config import Config
 import logging
 from dotenv import load_dotenv
 from agent_events import InputEvent, StreamEvent, ToolCallEvent
@@ -217,7 +220,7 @@ async def main():
             break
         print("User: ", user_input)
         response = await handle_user_message(user_input, agent)
-        print("Agent: ", response["response"])
-
+    print("Agent: ", response["response"])
+    
 if __name__ == "__main__":
     asyncio.run(main())
