@@ -1,0 +1,14 @@
+[project]
+name = "mcp-client-agent-langchain"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "asyncio>=3.4.3",
+    "langchain-community>=0.3.26",
+    "langchain-mcp-adapters>=0.1.7",
+    "langchain-ollama>=0.3.3",
+    "langgraph>=0.4.9",
+    "python-dotenv>=1.1.1",
+]
